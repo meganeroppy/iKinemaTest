@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
@@ -12,6 +13,15 @@ public class Manager : MonoBehaviour
 
     public int CurrentTarget { get; private set; }
 
+    [SerializeField]
+    private string[] animNames;
+
+    [SerializeField]
+    private Text[] animNameTexts;
+
+    [SerializeField]
+    private GameObject[] arrows;
+    
 	// Use this for initialization
 	void Start ()
     {
@@ -26,8 +36,24 @@ public class Manager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        CheckInput();	
+        CheckInput();
+
+        UpdateUI();
 	}
+
+    private void UpdateUI()
+    {
+        for (int i = 0; i < arrows.Length; ++i)
+        {
+            arrows[i].SetActive(i == CurrentTarget);
+        }
+
+        for (int i = 0; i < animNameTexts.Length; ++i)
+        {
+            animNameTexts[i].text = animNames[currentAnimIndexList[i]];
+        }
+
+    }
 
     private void CheckInput()
     {
