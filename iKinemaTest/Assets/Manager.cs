@@ -5,11 +5,22 @@ using UnityEngine.UI;
 
 public class Manager : MonoBehaviour
 {
+    enum ModelType
+    {
+        Kyle,
+        Male
+    }
+
+    ModelType currentModelType;
+
     [SerializeField]
-    private Animator[] animList;
+    private Animator[] animListKyle;
+
+    [SerializeField]
+    private Animator[] animListMale;
 
     private int[] currentAnimIndexList;
-    private const int animIndexMax = 8;
+    private const int animIndexMax = 3;
 
     public int CurrentTarget { get; private set; }
 
@@ -26,11 +37,13 @@ public class Manager : MonoBehaviour
 	void Start ()
     {
         CurrentTarget = 0;
-        currentAnimIndexList = new int[animList.Length];
+        currentAnimIndexList = new int[animListKyle.Length];
         for( int i=0; i < currentAnimIndexList.Length; ++i )
         {
             currentAnimIndexList[i] = 0;
         }
+
+        currentModelType = ModelType.Kyle;
 	}
 	
 	// Update is called once per frame
@@ -76,17 +89,23 @@ public class Manager : MonoBehaviour
         {
             ChangeAnim(false);
         }
+
+        // スペースで表示モデル切り替え
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SwitchModel();
+        }
     }
 
     public void ChangeTarget(bool forward)
     {
         if (forward)
         {
-            CurrentTarget = (CurrentTarget + 1) % animList.Length;
+            CurrentTarget = (CurrentTarget + 1) % animListKyle.Length;
         }
         else
         {
-            CurrentTarget = (CurrentTarget + animList.Length - 1) % animList.Length;
+            CurrentTarget = (CurrentTarget + animListKyle.Length - 1) % animListKyle.Length;
         }
 
         Debug.Log("現在のターゲット = " + CurrentTarget.ToString());
@@ -110,9 +129,36 @@ public class Manager : MonoBehaviour
     {
         var animName = "Motion" + currentAnimIndexList[CurrentTarget].ToString();
 
-        animList[CurrentTarget].SetTrigger(animName);
+        animListKyle[CurrentTarget].SetTrigger(animName);
+        animListMale[CurrentTarget].SetTrigger(animName);
 
         Debug.Log("ターゲット = " + CurrentTarget.ToString() + "にSetTrigger : " + animName);
 
+    }
+
+    /// <summary>
+    /// 表示モデルを切り替え
+    /// </summary>
+    private void SwitchModel()
+    {
+        currentModelType = currentModelType == ModelType.Kyle ? ModelType.Male : ModelType.Kyle;
+
+        foreach( Animator a in animListKyle )
+        {
+            var mesh = a.GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach( SkinnedMeshRenderer m in mesh)
+            {
+                m.enabled = currentModelType == ModelType.Kyle;
+            }
+        }
+
+        foreach (Animator a in animListMale)
+        {
+            var mesh = a.GetComponentsInChildren<SkinnedMeshRenderer>();
+            foreach (SkinnedMeshRenderer m in mesh)
+            {
+                m.enabled = currentModelType == ModelType.Male;
+            }
+        }
     }
 }
